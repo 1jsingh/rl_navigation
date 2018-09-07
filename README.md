@@ -3,7 +3,7 @@
 The project uses Deep Q-network (DQN) for training an agent to navigate in a banana world , while trying the maximize the cummulitive reward. The project uses **Unity** environment for training the reinforcement learning agent.
 
 
-### Setup
+## Setup
 
 To set up your python environment to run the code in this repository, follow the instructions below.
 
@@ -38,7 +38,7 @@ python -m ipykernel install --user --name drlnd --display-name "nav"
 
 
 
-### Environment Details
+## Environment Details
 
 A reward of +1 is provided for collecting a yellow banana, and a reward of -1 is provided for collecting a blue banana.  Thus, the goal of your agent is to collect as many yellow bananas as possible while avoiding blue bananas.  
 
@@ -50,7 +50,7 @@ The state space has 37 dimensions and contains the agent's velocity, along with 
 
 The task is episodic, and in order to solve the environment, your agent must get an average score of +13 over 100 consecutive episodes.
 
-### Getting Started
+## Getting Started
 
 1. Download the environment from one of the links below.  You need only select the environment that matches your operating system:
     - Linux: [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P1/Banana/Banana_Linux.zip)
@@ -62,6 +62,6 @@ The task is episodic, and in order to solve the environment, your agent must get
 
 2. Place the file in the DRLND GitHub repository, in the `p1_navigation/` folder, and unzip (or decompress) the file. 
 
-### Instructions
+## Instructions
 
 Follow the instructions in `Navigation.ipynb` to get started with training your own agent!
