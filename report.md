@@ -21,6 +21,7 @@ The current implementation uses a *DQN* (Deep Q Network) in order to train the a
   
   
 ## Plot of rewards
+It took 262 episodes for the agent to to solve the environment
 ![reward_plot](images/reward_plot.png)
 
 ## Ideas for future work
