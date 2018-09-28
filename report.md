@@ -12,7 +12,12 @@ The current implementation uses a *DQN* (Deep Q Network) in order to train the a
 * Other hyperparamters:
   * gamma = .99
   * learning rate = 5e-4
-  
+
+### Network architecture
+* RELU x fc(32)
+* RELU x fc(64)
+* RELU x fc(128)
+* fc(Action space size)
   
   
 ## Plot of rewards
