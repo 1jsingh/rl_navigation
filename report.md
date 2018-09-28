@@ -1,5 +1,8 @@
 # Project Report
 
+## Trained agent
+![trained agent](images/trained_agent.gif)
+
 ## Learning Algorithm
 The current implementation uses a *DQN* (Deep Q Network) in order to train the agent with the following configuration:
 * The agent uses fixed Q targets in order minimize confusion and oscillating action values
