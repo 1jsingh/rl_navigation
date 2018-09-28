@@ -2,6 +2,8 @@
 
 The project uses Deep Q-network (DQN) for training an agent to navigate in a banana world , while trying the maximize the cummulitive reward. The project uses **Unity** environment for training the reinforcement learning agent.
 
+### Trained agent
+![trained agent](images/trained_agent.gif)
 
 ## Setup
 
