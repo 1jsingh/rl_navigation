@@ -1,3 +1,4 @@
 push.sh
 pull.sh
 *.app
+*.DS_Store
