@@ -23,8 +23,8 @@ To set up your python environment to run the code in this repository, follow the
 	
 3. Clone the repository (if you haven't already!), and navigate to the `python/` folder.  Then, install several dependencies.
 ```bash
-git clone https://github.com/udacity/deep-reinforcement-learning.git
-cd deep-reinforcement-learning/python
+git clone https://github.com/1jsingh/rl_navigation.git
+cd rl_navigation/python
 pip install .
 ```
 
@@ -33,7 +33,7 @@ pip install .
 python -m ipykernel install --user --name drlnd --display-name "nav"
 ```
 
-5. Before running code in a notebook, change the kernel to match the `drlnd` environment by using the drop-down `Kernel` menu.
+5. Before running code in a notebook, change the kernel to match the `nav` environment by using the drop-down `Kernel` menu.
 
 
 **Note :** AWS users would have to enable X-server in order to visualise the performance of the agent. 
