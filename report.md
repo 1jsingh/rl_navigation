@@ -17,10 +17,10 @@ The current implementation uses a *DQN* (Deep Q Network) in order to train the a
   * learning rate = 5e-4
 
 ### Network architecture
-* RELU x fc(32)
-* RELU x fc(64)
-* RELU x fc(128)
-* fc(Action space size)
+* `RELU x fc(32)`
+* `RELU x fc(64)`
+* `RELU x fc(128)`
+* `fc(Action space size)`
   
   
 ## Plot of rewards
@@ -28,6 +28,6 @@ It took 262 episodes for the agent to to solve the environment
 ![reward_plot](images/reward_plot.png)
 
 ## Ideas for future work
-* Use prioritised experience replay
-* Use Double DQN
+* ~~Use prioritised experience replay~~
+* ~~Use Double DQN~~
 * Use Dueling DQN

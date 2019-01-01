@@ -65,3 +65,6 @@ The task is episodic, and in order to solve the environment, your agent must get
 ## Instructions
 
 Follow the instructions in `Navigation.ipynb` to get started with training your own agent!
+
+## Learning Algorithm
+For detailed explanation of the learning algorithm with the reward curve, please refer to [this file](report.md)
