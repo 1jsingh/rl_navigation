@@ -78,7 +78,10 @@ class Agent:
         q_pred = self.qnet_local.forward(states).gather(1,actions)
         
         # target action value
-        q_target = rewards + self.gamma*(1-dones)*self.qnet_target.forward(next_states).detach().max(1)[0].unsqueeze(1)
+        ## use double DQNs, refer https://arxiv.org/abs/1509.06461
+        next_action_local = self.qnet_local.forward(next_states).max(1)[1]
+        q_target = rewards + self.gamma*(1-dones)*self.qnet_target.forward(next_states)[range(self.batch_size),next_action_local].detach().unsqueeze(1)
+        # print (q_target.shape,next_action_local.shape)
         
         # defining loss
         loss = F.mse_loss(q_pred,q_target)
