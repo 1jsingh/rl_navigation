@@ -106,11 +106,11 @@ class Agent:
         Output : 
             action : scalar action as action space is discrete with dim = 1
         """
-        state = torch.from_numpy(state).float().to(device) # converts numpy array to torch tensor
+        state = torch.from_numpy(state).float().unsqueeze(dim=0).to(device) # converts numpy array to torch tensor
         
         self.qnet_local.eval() # put net in test mode
         with torch.no_grad():
-            max_action = np.argmax(self.qnet_local(state).cpu().data.numpy())
+            max_action = np.argmax(self.qnet_local(state)[0].cpu().data.numpy())
         self.qnet_local.train() # put net back in train mode
         
         rand_num = np.random.rand() # sample a random number uniformly between 0 and 1
