@@ -69,8 +69,9 @@ class Agent:
         Output : 
             none
         """
-        states, actions, rewards, next_states, dones = experiences
-        
+        states, actions, rewards, next_states, dones,wj,choose = experiences
+        #states, actions, rewards, next_states, dones = experiences
+
         # set optimizer grdient to zero
         self.optimizer.zero_grad()
         
@@ -78,10 +79,17 @@ class Agent:
         q_pred = self.qnet_local.forward(states).gather(1,actions)
         
         # target action value
-        q_target = rewards + self.gamma*(1-dones)*self.qnet_target.forward(next_states).detach().max(1)[0].unsqueeze(1)
+        ## use double DQNs, refer https://arxiv.org/abs/1509.06461
+        next_action_local = self.qnet_local.forward(next_states).max(1)[1]
+        q_target = rewards + self.gamma*(1-dones)*self.qnet_target.forward(next_states)[range(self.batch_size),next_action_local].unsqueeze(1)
         
+        # compute td error
+        td_error = q_target-q_pred
+        # update td error in Replay buffer
+        self.memory.update_td_error(choose,td_error.detach().cpu().numpy().squeeze())
+
         # defining loss
-        loss = F.mse_loss(q_pred,q_target)
+        loss = ((wj*td_error)**2).mean()
         
         # running backprop and optimizer step
         loss.backward()
@@ -125,27 +133,46 @@ class Agent:
 class ReplayBuffer:
     def __init__(self,buffer_size,batch_size):
         self.buffer = deque(maxlen=buffer_size)
-        self.experience = namedtuple("Experience", field_names=["state", "action", "reward", "next_state", "done"])
+        self.experience = namedtuple("Experience", field_names=["state", "action", "reward", "next_state", "done","td_error"])
         self.batch_size = batch_size
-        
+        self.epsilon = 1e-6
+        self.alpha = 2
+        self.beta = .3
+
     def add(self,state,action,reward,next_state,done):
-        e = self.experience(state,action,reward,next_state,done)
+        max_td_error = max([e.td_error for e in self.buffer if e is not None]+[0])
+        e = self.experience(state,action,reward,next_state,done,max_td_error)
         self.buffer.append(e)
     
-    def sample(self,random=True):
+    def update_td_error(self,choose,td_errors):
+        abs_td_errors = np.abs(td_errors)
+        for j,td_error in zip(choose,abs_td_errors):
+            self.buffer[j] = self.buffer[j]._replace(td_error=td_error)
+
+    def sample(self,random=False):
         if random:
             choose = np.random.choice(range(len(self.buffer)),self.batch_size,replace=False)
             experiences = [self.buffer[i] for i in choose]
         else:
-            pass
+            # prioritised experience replay
+            pi = np.array([e.td_error for e in self.buffer if e is not None]) + self.epsilon
+            Pi = pi**self.alpha
+            Pi = Pi/np.sum(Pi)
+            wi = (len(self.buffer)*Pi)**(-self.beta)
+            wi_ = wi/np.max(wi)
+            choose = np.random.choice(range(len(self.buffer)),self.batch_size,replace=False,p=Pi)
+            experiences = [self.buffer[j] for j in choose]
+            wj = [wi_[j] for j in choose]
+            wj = torch.from_numpy(np.vstack(wj)).float().to(device)
         
         states = torch.from_numpy(np.vstack([e.state for e in experiences if e is not None])).float().to(device)
         actions = torch.from_numpy(np.vstack([e.action for e in experiences if e is not None])).long().to(device)
         rewards = torch.from_numpy(np.vstack([e.reward for e in experiences if e is not None])).float().to(device)
         next_states = torch.from_numpy(np.vstack([e.next_state for e in experiences if e is not None])).float().to(device)
         dones = torch.from_numpy(np.vstack([e.done for e in experiences if e is not None]).astype(np.uint8)).float().to(device)
+        
 
-        return (states,actions,rewards,next_states,dones)
+        return (states,actions,rewards,next_states,dones,wj,choose)
     
     def __len__(self):
         return len(self.buffer)
