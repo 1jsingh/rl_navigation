@@ -10,12 +10,12 @@ import torch.nn.functional as F
 import torch.optim as optim
 
 
-UPDATE_EVERY = 4
+UPDATE_EVERY = 1
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 class Agent:
-    def __init__(self,state_size,action_size,gamma=0.99,lr=5e-4,
-                     buffer_size=int(1e5),batch_size=64,tau=1e-3):
+    def __init__(self,state_size,action_size,num_agents,gamma=0.99,lr=1e-3,
+                     buffer_size=int(1e6),batch_size=128,tau=1e-3):
         # defining local and target networks
         self.qnet_local = Qnetwork(state_size,action_size).to(device)
         self.qnet_target = Qnetwork(state_size,action_size).to(device)
@@ -26,6 +26,9 @@ class Agent:
         # experience replay buffer
         self.memory = ReplayBuffer(buffer_size,batch_size)
         
+        # number of parallel agents
+        self.num_agents = num_agents
+
         # defining variables
         self.state_size = state_size
         self.action_size = action_size
@@ -49,7 +52,8 @@ class Agent:
             none
         """
         # add sample to the memory buffer
-        self.memory.add(state,action,reward,next_state,done)
+        for i in range(self.num_agents):
+            self.memory.add(state[i],action[i],reward[i],next_state[i],done[i])
         
         # Learn every UPDATE_EVERY time steps.
         self.t_step = (self.t_step + 1) % UPDATE_EVERY
@@ -69,8 +73,8 @@ class Agent:
         Output : 
             none
         """
-        states, actions, rewards, next_states, dones,wj,choose = experiences
-        #states, actions, rewards, next_states, dones = experiences
+        #states, actions, rewards, next_states, dones,wj,choose = experiences
+        states, actions, rewards, next_states, dones = experiences
 
         # set optimizer grdient to zero
         self.optimizer.zero_grad()
@@ -86,10 +90,11 @@ class Agent:
         # compute td error
         td_error = q_target-q_pred
         # update td error in Replay buffer
-        self.memory.update_td_error(choose,td_error.detach().cpu().numpy().squeeze())
+        # self.memory.update_td_error(choose,td_error.detach().cpu().numpy().squeeze())
 
         # defining loss
-        loss = ((wj*td_error)**2).mean()
+        #loss = ((wj*td_error)**2).mean()
+        loss = (td_error**2).mean()
         
         # running backprop and optimizer step
         loss.backward()
@@ -106,20 +111,20 @@ class Agent:
         Output : 
             action : scalar action as action space is discrete with dim = 1
         """
-        state = torch.from_numpy(state).float().unsqueeze(dim=0).to(device) # converts numpy array to torch tensor
+        state = torch.from_numpy(state).float().to(device) # converts numpy array to torch tensor
         
         self.qnet_local.eval() # put net in test mode
         with torch.no_grad():
-            max_action = np.argmax(self.qnet_local(state)[0].cpu().data.numpy())
+            max_actions = np.argmax(self.qnet_local(state).cpu().data.numpy(),axis=1)
         self.qnet_local.train() # put net back in train mode
         
-        rand_num = np.random.rand() # sample a random number uniformly between 0 and 1
-        
-        # implementing epsilon greedy policy
-        if rand_num < eps:
-            return np.random.randint(self.action_size)
-        else: 
-            return max_action
+        rand_num = np.random.rand(self.num_agents) # sample a random number uniformly between 0 and 1
+        rand_actions = np.random.randint(low=0,high=self.action_size,size=self.num_agents)
+
+        check = rand_num < eps
+        action = check*rand_actions + np.invert(check)*max_actions
+
+        return action
         
     def soft_update(self,tau):
         """Soft update model parameters.
@@ -172,7 +177,7 @@ class ReplayBuffer:
         dones = torch.from_numpy(np.vstack([e.done for e in experiences if e is not None]).astype(np.uint8)).float().to(device)
         
 
-        return (states,actions,rewards,next_states,dones,wj,choose)
+        return (states,actions,rewards,next_states,dones)#,wj,choose)
     
     def __len__(self):
         return len(self.buffer)
