@@ -1,3 +1,6 @@
 push.sh
 pull.sh
-*.app
+unity_envs
+__pycache__
+.ipynb_checkpoints
+*.log
