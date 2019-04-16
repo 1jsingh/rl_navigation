@@ -2,69 +2,104 @@
 
 The project uses **Dueling Double Deep Q-network (DDQN)** with **prioritized experience replay** for training an agent to navigate in a banana world , while trying the maximize the cummulitive reward. The project uses **Unity** environment for training the reinforcement learning agent.
 
-### Trained agent
+## Table of Contents
+
+* [Trained Agent Demo](#trained-agent-demo)
+* [Banana Collector Unity Environment](#banana-collector-unity-environment)
+* [Setup](#setup)
+    * [System Configuration](#system-configuration)
+    * [Environment Setup](#environment-setup)
+    * [Instructions for getting started](#instructions-for-getting-started)
+    * [Project Structure](#project-structure)
+* [Reward Curve](#reward-curve)
+* [Bibliography](#bibliography)
+
+##  Trained Agent Demo
 ![trained agent](images/trained_agent.gif)
 
-## Setup
+## Banana Collector Unity Environment
 
-To set up your python environment to run the code in this repository, follow the instructions below.
+* Set-up: A multi-agent environment where agents compete to collect bananas.
+* Goal: The agents must learn to move to as many yellow bananas as possible
+  while avoiding blue bananas.
+* Agents: The environment contains 5 agents linked to a single Brain.
+* Agent Reward Function (independent):
+  * +1 for interaction with yellow banana
+  * -1 for interaction with blue banana.
+* Brains: One Brain with the following observation/action space.
+  * Vector Observation space: 53 corresponding to velocity of agent (2), whether
+    agent is frozen and/or shot its laser (2), plus ray-based perception of
+    objects around agent's forward direction (49; 7 raycast angles with 7
+    measurements for each).
+  * Vector Action space: (Discrete) 4 Branches:
+    * Forward Motion (3 possible actions: Forward, Backwards, No Action)
+    * Side Motion (3 possible actions: Left, Right, No Action)
+    * Rotation (3 possible actions: Rotate Left, Rotate Right, No Action)
+    * Laser (2 possible actions: Laser, No Action)
+  * Visual Observations (Optional): First-person camera per-agent. Use
+    `VisualBanana` scene.
+* Reset Parameters: None.
+* Benchmark Mean Reward: 10
 
-1. Create (and activate) a new environment with Python 3.6.
+# Setup
 
-	- __Linux__ or __Mac__: 
-	```bash
-	conda create --name nav python=3.6
-	source activate nav
-	```
-	
-2. Follow the instructions in [this repository](https://github.com/openai/gym) to perform a minimal install of OpenAI gym.  
-	- Next, install the **classic control** environment group by following the instructions [here](https://github.com/openai/gym#classic-control).
-	- Then, install the **box2d** environment group by following the instructions [here](https://github.com/openai/gym#box2d).
-	
-3. Clone the repository (if you haven't already!), and navigate to the `python/` folder.  Then, install several dependencies.
+## System Configuration
+The project was built with the following configuration:
+
+* Ubuntu 16.04
+* CUDA 10.0
+* CUDNN 7.4
+* Python 3.6 (currently ml-agents unity package does not work with python=3.7)
+* Pytorch 1.0
+
+Though not tested, the project can still be expected to work out of the box for most reasonably deviant configurations.
+
+## Environment Setup
+
+* Create separate virtual environment for the project using the provided `environment.yml` file
+```
+conda create -f environment.yml
+conda activate navigation
+```
+
+## Instructions for getting started!
+
+1. Clone the repository (if you haven't already!)
 ```bash
 git clone https://github.com/1jsingh/rl_navigation.git
-cd rl_navigation/python
-pip install .
+cd rl_navigation
 ```
 
-4. Create an [IPython kernel](http://ipython.readthedocs.io/en/stable/install/kernel_install.html) for the `drlnd` environment.  
-```bash
-python -m ipykernel install --user --name drlnd --display-name "nav"
-```
+2. Download the environment from one of the links below.  You need only select the environment that matches your operating system:
 
-5. Before running code in a notebook, change the kernel to match the `nav` environment by using the drop-down `Kernel` menu.
+    
+    - Linux: [click here](https://drive.google.com/open?id=1hbezVc5oOthoQ2VF9c4RPWxsf5M8mxEh)
+    - Mac OSX: [click here](https://drive.google.com/open?id=1HTvJxRA24bJKsyzzfy3-J7eOo8XJYpF1N)
+
+    (_For AWS_) If you'd like to train the agent on AWS (and have not [enabled a virtual screen](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Training-on-Amazon-Web-Service.md)), then please use [this link](https://drive.google.com/open?id=1BpLCYfGcp7y5WPAPPmxxe0mVcYM1LG9N) to obtain the "headless" version of the environment.  You will **not** be able to watch the agent without enabling a virtual screen, but you will be able to train the agent.  (_To watch the agent, you should follow the instructions to [enable a virtual screen](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Training-on-Amazon-Web-Service.md), and then download the environment for the **Linux** operating system above._)
+       
+3. Place the downloaded file in the `unity_envs` directory and unzip it.
+  ```
+  mkdir unity_envs && cd unity_envs
+  unzip Banana_Collector_Linux.zip
+  ```
+
+4. Follow along with `Navigation.ipynb` to train your own RL agent.
+
+## Project Structure
+
+* `Navigation.ipynb`: notebook for training Double Dueling DQN agent for the Banana Collector Environment
+* `dqn_agent.py`: DQN agent and Replay Buffer class
+* `model.py`: model definitions for the DQN agent
+* `unity_envs`: directory for downloading and storing the unity envs for your system
 
 
-**Note :** AWS users would have to enable X-server in order to visualise the performance of the agent. 
+## Reward Curve
+<img src='images/reward_curve-ddqn.png' alt='reward_curve-ddqn'>
 
-
-
-## Environment Details
-
-A reward of +1 is provided for collecting a yellow banana, and a reward of -1 is provided for collecting a blue banana.  Thus, the goal of your agent is to collect as many yellow bananas as possible while avoiding blue bananas.  
-
-The state space has 37 dimensions and contains the agent's velocity, along with ray-based perception of objects around agent's forward direction.  Given this information, the agent has to learn how to best select actions.  Four discrete actions are available, corresponding to:
-- **`0`** - move forward.
-- **`1`** - move backward.
-- **`2`** - turn left.
-- **`3`** - turn right.
-
-The task is episodic, and in order to solve the environment, your agent must get an average score of +13 over 100 consecutive episodes.
-
-## Getting Started
-
-1. Download the environment from one of the links below.  You need only select the environment that matches your operating system:
-    - Linux: [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P1/Banana/Banana_Linux.zip)
-    - Mac OSX: [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P1/Banana/Banana.app.zip)
-
-    (_For AWS_) If you'd like to train the agent on AWS (and have not [enabled a virtual screen](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Training-on-Amazon-Web-Service.md)), then please use [this link](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P1/Banana/Banana_Linux_NoVis.zip) to obtain the environment.
-
-2. Place the file in the rl_navigation directory after unzipping it.
-
-## Instructions
-
-Follow the instructions in `Navigation.ipynb` to get started with training your own agent!
-
-## Learning Algorithm
-For detailed explanation of the learning algorithm with the reward curve, please refer to [this file](report.md)
+# Bibliography
+1. <cite>Wang, Ziyu, et al. "Dueling network architectures for deep reinforcement learning." arXiv preprint arXiv:1511.06581 (2015).
+</cite>
+2. <cite>Van Hasselt, Hado, Arthur Guez, and David Silver. "Deep reinforcement learning with double q-learning." Thirtieth AAAI Conference on Artificial Intelligence. 2016.</cite>
+3. <cite>Mnih, Volodymyr, et al. "Human-level control through deep reinforcement learning." Nature 518.7540 (2015): 529.</cite>
+4. <cite>Lillicrap, Timothy P., et al. "Continuous control with deep reinforcement learning." arXiv preprint arXiv:1509.02971 (2015).</cite>
