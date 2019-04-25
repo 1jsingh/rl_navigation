@@ -1,6 +1,6 @@
 # Navigation using DQN
 
-The project uses **Dueling Double Deep Q-network (DDQN)** with **prioritized experience replay** for training an agent to navigate in an artificial banana world, while trying the maximize the cummulitive reward. The project uses **Unity** environment for training the reinforcement learning agent.
+The project uses **Dueling Double DQN** with **prioritized experience replay** for training an agent to navigate in an artificial banana world, while trying the maximize the cummulitive reward. The project uses **Unity** environment for training the reinforcement learning agent.
 
 ## Table of Contents
 
