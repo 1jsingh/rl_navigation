@@ -1,6 +1,6 @@
 # Navigation using DQN
 
-The project uses **Dueling Double Deep Q-network (DDQN)** with **prioritized experience replay** for training an agent to navigate in a banana world , while trying the maximize the cummulitive reward. The project uses **Unity** environment for training the reinforcement learning agent.
+The project uses **Dueling Double Deep Q-network (DDQN)** with **prioritized experience replay** for training an agent to navigate in an artificial banana world, while trying the maximize the cummulitive reward. The project uses **Unity** environment for training the reinforcement learning agent.
 
 ## Table of Contents
 
@@ -11,6 +11,7 @@ The project uses **Dueling Double Deep Q-network (DDQN)** with **prioritized exp
     * [Environment Setup](#environment-setup)
     * [Instructions for getting started](#instructions-for-getting-started)
     * [Project Structure](#project-structure)
+* [Algorithm Details](#algorithm-details)
 * [Reward Curve](#reward-curve)
 * [Bibliography](#bibliography)
 
@@ -93,6 +94,39 @@ cd rl_navigation
 * `model.py`: model definitions for the DQN agent
 * `unity_envs`: directory for downloading and storing the unity envs for your system
 
+# Algorithm Details
+
+The algorithm uses a Dueling Double DQN along with prioritised experience replay for learning.
+
+Here's the breakdown:
+
+* Dueling Q Networks (**DDQN**): Refer https://arxiv.org/abs/1511.06581
+* Double DQNs: Refer https://arxiv.org/abs/1509.06461
+* Prioritised experience replay (**PER**): Refer https://arxiv.org/abs/1511.05952
+
+### Efficient Implementation for Prioritised Experience Replay
+The concept of using prioritised experience replay is to sample experiences with higher TD errors with a higher probability.
+
+However, doing so comes at the cost of higher sampling and update times to the experience buffer ***{D}***. 
+
+The following shows the time complexity for key operations required for PER:
+
+* Compute max priority from the experience replay: **O(n)**
+* Compute sum of priorities for all samples from the experience replay: **O(n)**
+* Insertion of new samples in the experience replay: **O(1)**
+
+Thus time complexity for a naive implementation for PER : **O(n)**
+
+In order to work around this problem, I designed a fixed size binary search tree for computing the maximum priority with a buffer for storing the sum of these priorities.
+
+Time complexity for fixed size binary search tree based optimized implementation of PER:
+
+* Compute max priority from the experience replay: **O(log(n))**
+* Compute sum of priorities for all samples from the experience replay: **O(1)**
+* Insertion of new samples in the experience replay: **O(1)**
+
+
+Thus the overall time complexity for optimized implementation of PER: **O(log(n))**
 
 ## Reward Curve
 <img src='images/reward_curve-ddqn.png' alt='reward_curve-ddqn'>
@@ -102,3 +136,4 @@ cd rl_navigation
 2. <cite> Van Hasselt, Hado, Arthur Guez, and David Silver. "Deep reinforcement learning with double q-learning." Thirtieth AAAI Conference on Artificial Intelligence. 2016.</cite>
 3. <cite> Mnih, Volodymyr, et al. "Human-level control through deep reinforcement learning." Nature 518.7540 (2015): 529.  </cite>
 4. <cite> Lillicrap, Timothy P., et al. "Continuous control with deep reinforcement learning." arXiv preprint arXiv:1509.02971 (2015).</cite>
+5. <cite>Schaul, Tom, et al. "Prioritized experience replay." arXiv preprint arXiv:1511.05952 (2015).</cite>
